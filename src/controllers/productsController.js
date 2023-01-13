@@ -54,7 +54,7 @@ const controller = {
 	// Update - Form to edit
 	edit: (req, res) => {
 		// Do the magic
-		const id = +req.params.id;
+		let id = +req.params.id;
 		let edit = productos.find(producto => producto.id === id);
 		return res.render('product-edit-form', {
 			toEdit : edit
@@ -67,7 +67,25 @@ const controller = {
 
 	// Delete - Delete one product from DB
 	destroy : (req, res) => {
-		return res.send('Producto eliminado')
+		
+		let idParams = +req.params.id
+
+		let product = productos.find(product => product.id === idParams)
+		let ruta = fs.existsSync(path.join(__dirname,'..','..','public','images','products',product.image))
+	
+		
+		if (ruta && product.image !== "default-image.png") {
+			fs.unlinkSync(path.join(__dirname,'..','..','public','images','products',product.image))
+		}
+
+		let modified = productos.filter(producto => {
+			return producto.id !== idParams
+		})
+
+		saveProduct(modified)
+
+			return res.redirect('/')
+
 	}
 };
 
