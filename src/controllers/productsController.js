@@ -7,7 +7,6 @@ const saveProduct = (dato)=> fs.writeFileSync(path.join(__dirname, '../data/prod
 const toThousand = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
 const controller = {
-	// Root - Show all products
 	index: (req, res) => {
 		return res.render('products',{
 			productos,
@@ -15,7 +14,6 @@ const controller = {
 		})
 	},
 
-	// Detail - Detail from one product
 	detail: (req, res) => {
 		let id = +req.params.id
 
@@ -27,12 +25,10 @@ const controller = {
 		})
 	},
 
-	// Create - Form to create
 	create: (req, res) => {
 		return res.render('product-create-form')
 	},
 	
-	// Create -  Method to store
 	store: (req, res) => {
 
 		let {name,price,discount,category,description}=req.body
@@ -51,21 +47,33 @@ const controller = {
 		res.redirect('/products')
 	},
 
-	// Update - Form to edit
 	edit: (req, res) => {
-		// Do the magic
 		let id = +req.params.id;
 		let edit = productos.find(producto => producto.id === id);
 		return res.render('product-edit-form', {
 			toEdit : edit
 		})
 	},
-	// Update - Method to update
-	update: (req, res) => {
-		return res.send('Producto modificado')
+	update: (req, res) =>  {
+		// Do the magic
+		
+		let idParams = +req.params.id
+		let {name,price,discount,description} = req.body
+
+		productos.forEach(product => {
+			if (product.id === idParams) {
+				product.name = name,
+				product.price = price,
+				product.discount = discount,
+				product.description = description
+				product.imagen = req.file ? req.file.originalname : product.image
+			}
+		});
+		saveProduct(productos)
+		return res.redirect(`/products`)
+
 	},
 
-	// Delete - Delete one product from DB
 	destroy : (req, res) => {
 		
 		let idParams = +req.params.id
